@@ -1,0 +1,167 @@
+<!DOCTYPE htlml>
+<html lang="cs">
+<meta charset="UTF-8">
+<meta content-="UTF-8">
+<title>
+    Genesis resources users dashboard
+</title>
+<script type="text/javascript">
+
+    function sayHello() {
+        alert("Hello");
+    }
+
+    function addElement() {
+        var p = document.createElement("p");
+        var text = document.createTextNode("Ahoj to je poznamka");
+        p.appendChild(text);
+        var element = document.getElementById("main").appendChild(p);
+    }
+
+    async function getResponse() {
+        var url = "http://localhost:8080/api/v1/users";
+        fetch(url,
+            { method: "GET" })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById("users").innerHTML = "";
+                const tab = document.createElement("table");
+
+
+                data.forEach(object => {
+                    const row = document.createElement("tr");
+                    row.style.border = "1px";
+                    row.innerHTML = '<td >' + object.id + '</td> ' +
+                        '<td>' + object.name + '</td> ' +
+                        '<td>' + object.surname + '</td> ';
+                    tab.appendChild(row);
+                });
+                document.getElementById("users").appendChild(tab);
+
+            });
+    }
+
+    /*     const p = document.createElement();
+        async function sendRequest(){
+            const nameOfuser = document.getElementById("nameOfUser").send;
+            await fetch("", {method: "POST", body: JSON.stringify(nameOfuser) }) */
+
+    function append_json_data(data) {
+        var table = document.getElementById('prodTable');
+        data.forEach((object) => {
+            var tr = document.createElement('tr');
+            tr.border = "3px";
+            tr.innerHTML = '<td>' + object.No + '</td>' +
+                '<td>' + object.Name + '</td>' +
+                '<td>' + object.Category + '</td>' +
+                '<td>' + object.Slug + '</td>' +
+                '<td>' + object.GST_Price + '</td>';
+            table.appendChild(tr);
+        });
+    }
+
+    async function newUser() {
+        var name = document.createElement('input');
+        name.type = 'text'; // Set input type
+        name.placeholder = 'Jméno'; // Add placeholder
+        name.id = 'name'; // Set an ID for reference
+
+        var surname = document.createElement('input');
+        surname.type = 'text'; // Set input type
+        surname.placeholder = 'Příjmení'; // Add placeholder
+        surname.id = 'surname'; // Set an ID for reference
+
+        var personId = document.createElement('input');
+        personId.type = 'text'; // Set input type
+        personId.placeholder = 'Příjmení'; // Add placeholder
+        personId.id = 'personId'; // Set an ID for reference
+
+        var inputbutton = document.createElement('input');
+        inputbutton.type = 'button'; // Set input type
+        inputbutton.placeholder = 'Ulož'; // Add placeholder
+        inputbutton.value = 'Ulož'; // Add placeholder
+        
+        inputbutton.onclick = saveUser(convertToJson(data)); // Add placeholder
+
+        document.getElementById("newUser").innerHTML = "";
+        document.getElementById("newUser").appendChild(name);
+        document.getElementById("newUser").appendChild(surname);
+        document.getElementById("newUser").appendChild(personId);
+        document.getElementById("newUser").appendChild(inputbutton);
+
+        var data = document.getElementById('newUser');
+       
+
+    }
+
+    function convertToJson(form) {
+      
+      const formData = new FormData(form);
+      const jsonObject = {};
+
+      formData.forEach((value, key) => {
+        jsonObject[key] = value;
+      });
+
+      console.log(JSON.stringify(jsonObject, null, 2)); // Pretty-print JSON in console
+    }
+    function saveUser(data) {
+
+               var url = "http://localhost:8080/api/v1/users";
+
+        fetch(url, {
+            method: 'POST', // HTTP method
+            headers: {
+                'Content-Type': 'application/json', // Specify JSON format
+            },
+            body: JSON.stringify(data), // Convert data to JSON string
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json(); // Parse JSON response
+            })
+            .then((result) => {
+                console.log('Success:', result); // Handle success
+            })
+            .catch((error) => {
+                console.error('Error:', error); // Handle errors
+            });
+
+    }
+</script>
+
+<body>
+
+    <input type="button" value="Pozdrav" onclick="sayHello()">
+
+    <input type="button" value="Nový odstavec" onclick="addElement()">
+
+
+    <input type="button" value="Načíst data" onclick="getResponse()">
+
+    <input type="button" value="Nový uživatel" onclick="newUser()">
+
+    <input type="button" value="Uprav uživatele" onclick="updateUser()">
+
+    <div id="main">
+
+    </div>
+
+    <div id="prodTable"></div>
+
+    <div id="users"></div>
+
+    <div id="newUser"></div>
+
+    <div id="updateUser"></div>
+
+
+
+
+
+</body>
+
+</html>
