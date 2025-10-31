@@ -3,9 +3,7 @@ package cz.engeto.GenesisResouces.controller;
 import cz.engeto.GenesisResouces.dto.User;
 import cz.engeto.GenesisResouces.dto.UserDto;
 import cz.engeto.GenesisResouces.service.UserService;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +22,6 @@ public class UserController {
     public void create() {
         userService.createAndSaveDeafaultUsers();
     }
-
-//    @GetMapping("/home")
-//    public String homepage(){
-//        return "index";
-//    }
 
     @GetMapping("users")
     public Object getAllUsers(@RequestParam(required = false) boolean detail) {

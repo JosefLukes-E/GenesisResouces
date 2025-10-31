@@ -1,40 +1,51 @@
 <!DOCTYPE htlml>
 <html lang="cs">
 <meta charset="UTF-8">
-<meta content-="UTF-8">
 <title>
     Genesis resources users dashboard
 </title>
+<style>
+    table {
+        border-collapse: collapse; /* Ensures borders are merged */
+        width: 100%; /* Full width */
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 <script type="text/javascript">
-
-    function sayHello() {
-        alert("Hello");
-    }
-
-    function addElement() {
-        var p = document.createElement("p");
-        var text = document.createTextNode("Ahoj to je poznamka");
-        p.appendChild(text);
-        var element = document.getElementById("main").appendChild(p);
-    }
 
     async function getResponse() {
         var url = "http://localhost:8080/api/v1/users";
         fetch(url,
-            { method: "GET" })
+            {method: "GET"})
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 document.getElementById("users").innerHTML = "";
                 const tab = document.createElement("table");
-
+                const headerRow = document.createElement('tr');
+                //const headers = ['ID', 'Jméno', 'Příjmení'];
+                Object.keys(data[0]).forEach(headerText => {
+                    const header = document.createElement('th');
+                    header.textContent = headerText;
+                    headerRow.appendChild(header);
+                });
+                tab.appendChild(headerRow);
 
                 data.forEach(object => {
                     const row = document.createElement("tr");
-                    row.style.border = "1px";
-                    row.innerHTML = '<td >' + object.id + '</td> ' +
-                        '<td>' + object.name + '</td> ' +
-                        '<td>' + object.surname + '</td> ';
+
+                    Object.values(object).forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
                     tab.appendChild(row);
                 });
                 document.getElementById("users").appendChild(tab);
@@ -42,125 +53,251 @@
             });
     }
 
-    /*     const p = document.createElement();
-        async function sendRequest(){
-            const nameOfuser = document.getElementById("nameOfUser").send;
-            await fetch("", {method: "POST", body: JSON.stringify(nameOfuser) }) */
-
-    function append_json_data(data) {
-        var table = document.getElementById('prodTable');
-        data.forEach((object) => {
-            var tr = document.createElement('tr');
-            tr.border = "3px";
-            tr.innerHTML = '<td>' + object.No + '</td>' +
-                '<td>' + object.Name + '</td>' +
-                '<td>' + object.Category + '</td>' +
-                '<td>' + object.Slug + '</td>' +
-                '<td>' + object.GST_Price + '</td>';
-            table.appendChild(tr);
-        });
-    }
-
     async function newUser() {
-        var name = document.createElement('input');
-        name.type = 'text'; // Set input type
-        name.placeholder = 'Jméno'; // Add placeholder
-        name.id = 'name'; // Set an ID for reference
+        const name = document.createElement('input');
+        name.type = 'text';
+        //name.textContent = 'Jméno:';
+        name.placeholder = 'Jméno';
+        name.id = 'name';
+        name.name = 'name';
 
-        var surname = document.createElement('input');
-        surname.type = 'text'; // Set input type
-        surname.placeholder = 'Příjmení'; // Add placeholder
-        surname.id = 'surname'; // Set an ID for reference
 
-        var personId = document.createElement('input');
-        personId.type = 'text'; // Set input type
-        personId.placeholder = 'Příjmení'; // Add placeholder
-        personId.id = 'personId'; // Set an ID for reference
+        const surname = document.createElement('input');
+        surname.type = 'text';
+        surname.placeholder = 'Příjmení';
+        //surname.textContent = 'Příjmení:';
+        surname.id = 'surname';
+        surname.name = 'surname';
+        //surname.value = 'surname';
 
-        var inputbutton = document.createElement('input');
-        inputbutton.type = 'button'; // Set input type
-        inputbutton.placeholder = 'Ulož'; // Add placeholder
-        inputbutton.value = 'Ulož'; // Add placeholder
-        
-        inputbutton.onclick = saveUser(convertToJson(data)); // Add placeholder
+        const personId = document.createElement('input');
+        personId.type = 'text';
+        personId.placeholder = 'Personal ID';
+        //personId.textContent = 'Personal ID:';
+        personId.id = 'personId';
+        personId.name = 'personId';
+        //personId.value = 'personId'; Set an ID for reference
+
+        const inputbutton = document.createElement('button');
+        inputbutton.type = 'submit';
+        inputbutton.placeholder = 'Ulož';
+        // inputbutton.value = 'Ulož'; // Add placeholder
+        inputbutton.title = "Ulož";
+        inputbutton.textContent = 'Ulož';
+        //inputbutton.onclick = readForm(); // Add placeholder
 
         document.getElementById("newUser").innerHTML = "";
-        document.getElementById("newUser").appendChild(name);
-        document.getElementById("newUser").appendChild(surname);
-        document.getElementById("newUser").appendChild(personId);
-        document.getElementById("newUser").appendChild(inputbutton);
+        const form = document.createElement('form');
+        form.appendChild(name);
+        form.appendChild(surname);
+        form.appendChild(personId);
+        form.appendChild(inputbutton);
 
-        var data = document.getElementById('newUser');
-       
 
-    }
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
 
-    function convertToJson(form) {
-      
-      const formData = new FormData(form);
-      const jsonObject = {};
 
-      formData.forEach((value, key) => {
-        jsonObject[key] = value;
-      });
+            const formData = new FormData(form);
 
-      console.log(JSON.stringify(jsonObject, null, 2)); // Pretty-print JSON in console
-    }
-    function saveUser(data) {
-
-               var url = "http://localhost:8080/api/v1/users";
-
-        fetch(url, {
-            method: 'POST', // HTTP method
-            headers: {
-                'Content-Type': 'application/json', // Specify JSON format
-            },
-            body: JSON.stringify(data), // Convert data to JSON string
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json(); // Parse JSON response
-            })
-            .then((result) => {
-                console.log('Success:', result); // Handle success
-            })
-            .catch((error) => {
-                console.error('Error:', error); // Handle errors
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
             });
+            console.log('Form Data Submitted:', data);
+
+            const jsonData = JSON.stringify(data);
+            const apiUrl = 'http://localhost:8080/api/v1/users';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+                .then(response => {
+                    return response.text(); // Return response as text
+                })
+                .then(message => {
+                    // Display response in the modal
+                    document.getElementById('modalMessage').textContent = message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalMessage').textContent = 'An error occurred: ' + error.message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                });
+        });
+        document.getElementById("newUser").appendChild(form);
+    }
+
+    function updateUser() {
+        const name = document.createElement('input');
+        name.type = 'text';
+        //name.textContent = 'Jméno:';
+        name.placeholder = 'Jméno';
+        name.id = 'name';
+        name.name = 'name';
+
+
+        const surname = document.createElement('input');
+        surname.type = 'text';
+        surname.placeholder = 'Příjmení';
+        //surname.textContent = 'Příjmení:';
+        surname.id = 'surname';
+        surname.name = 'surname';
+
+
+        const id = document.createElement('input');
+        id.type = 'text';
+        id.placeholder = 'ID Uživatele';
+        // id.textContent = 'ID Uživatele:';
+        id.id = 'id';
+        id.name = 'id';
+
+
+        const inputbutton = document.createElement('button');
+        inputbutton.type = 'submit';
+        inputbutton.placeholder = 'Ulož';
+        // inputbutton.value = 'Ulož'; // Add placeholder
+        inputbutton.title = "Ulož";
+        inputbutton.textContent = 'Ulož';
+
+
+        document.getElementById("updateUser").innerHTML = "";
+        const form = document.createElement('form');
+        form.appendChild(name);
+        form.appendChild(surname);
+        form.appendChild(id);
+        form.appendChild(inputbutton);
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            console.log('Form Data Submitted:', data);
+
+            const jsonData = JSON.stringify(data);
+            const apiUrl = 'http://localhost:8080/api/v1/users' ;
+
+            fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+                .then(response => {
+
+                    return response.text(); // Return response as text
+                })
+                .then(message => {
+                    // Display response in the modal
+                    document.getElementById('modalMessage').textContent = message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalMessage').textContent = 'An error occurred: ' + error.message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                });
+
+        });
+        document.getElementById("updateUser").appendChild(form);
+
+    }
+    function deleteUser() {
+
+        const id = document.createElement('input');
+        id.type = 'text';
+        id.placeholder = 'ID Uživatele';
+        //id.textContent = 'ID Uživatele:';
+        id.id = 'id';
+        id.name = 'id';
+
+        const inputbutton = document.createElement('button');
+        inputbutton.type = 'submit';
+        inputbutton.placeholder = 'Ulož';
+        inputbutton.title = "Ulož";
+        inputbutton.textContent = 'Ulož';
+
+        document.getElementById("deleteUser").innerHTML = "";
+        const form = document.createElement('form');
+
+        form.appendChild(id);
+        form.appendChild(inputbutton);
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            console.log('Form Data Submitted:', data);
+
+            const jsonData = JSON.stringify(data);
+            const apiUrl = 'http://localhost:8080/api/v1/users/' + id.value;
+
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+                .then(response => {
+                    return response.text(); // Return response as text
+                })
+                .then(message => {
+                    // Display response in the modal
+                    document.getElementById('modalMessage').textContent = message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalMessage').textContent = 'An error occurred: ' + error.message;
+                    document.getElementById('myModal').style.display = "block"; // Show the modal
+                });
+        });
+        document.getElementById("deleteUser").appendChild(form);
 
     }
 </script>
 
 <body>
 
-    <input type="button" value="Pozdrav" onclick="sayHello()">
+<input onclick="getResponse()" type="button" value="Načíst data">
 
-    <input type="button" value="Nový odstavec" onclick="addElement()">
+<input onclick="newUser()" type="button" value="Nový uživatel">
 
+<input onclick="updateUser()" type="button" value="Uprav uživatele">
 
-    <input type="button" value="Načíst data" onclick="getResponse()">
+<input onclick="deleteUser()" type="button" value="Smaž uživatele">
 
-    <input type="button" value="Nový uživatel" onclick="newUser()">
+<div id="users"></div>
 
-    <input type="button" value="Uprav uživatele" onclick="updateUser()">
+<div id="newUser"></div>
 
-    <div id="main">
+<div id="updateUser"></div>
 
+<div id="deleteUser"></div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times; Odpověď ze serveru:</span>
+        <p id="modalMessage"></p>
     </div>
-
-    <div id="prodTable"></div>
-
-    <div id="users"></div>
-
-    <div id="newUser"></div>
-
-    <div id="updateUser"></div>
-
-
-
-
+</div>
 
 </body>
 
